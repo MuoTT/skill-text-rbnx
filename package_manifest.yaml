@@ -1,12 +1,13 @@
 manifestVersion: 1
 
 package:
-  name: robonix.skill.xyz.text
+  name: robonix.skill.hdu.text
   version: 0.1.0
   description: XYZ 三轴写字机文本技能 — 基于 Robonix XYZ SDK 的中英文单笔画书写。
   tags: [skill, plot, write, text, xyz]
   maintainers:
-    - robot-xyz-robonix contributors
+    - shadosider <1439107161@qq.com>
+    - MuoTT <muott0927@gmail.com>
   license: MIT
 
 build: bash scripts/build.sh
