@@ -1,11 +1,11 @@
-# skill-hdu-text-rbnx
+# skill-text-rbnx
 
 Robonix **skill** that converts Chinese/English text into pen-up/down
 waypoints and executes them through the plotter primitive. It owns
 `robonix/skill/text/*`. Drawing, prompt-to-image, and image tracing live in
-[`skill-hdu-draw-rbnx`](../skill-hdu-draw-rbnx).
+[`skill-draw-rbnx`](../skill-draw-rbnx).
 
-Catalog name: `robonix.skill.xyz.text`.
+Catalog name: `robonix.skill.write_text`.
 
 The skill never talks TCP or PLC. It resolves
 `robonix/primitive/plotter/{trajectory,home}` through Atlas and sends
@@ -69,7 +69,7 @@ call.
 ## Layout
 
 ```text
-skill-hdu-text-rbnx/
+skill-text-rbnx/
 ├── package_manifest.yaml
 ├── capabilities/
 │   ├── text_driver.v1.toml

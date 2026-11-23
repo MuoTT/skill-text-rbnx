@@ -29,6 +29,7 @@ from robonix_api.atlas_types import GrpcParams, Transport
 REQUIRED_CONTRACTS = {
     "trajectory": "robonix/primitive/plotter/trajectory",
     "home": "robonix/primitive/plotter/home",
+    "status": "robonix/primitive/plotter/status",
 }
 
 
@@ -45,6 +46,18 @@ class Binding:
     endpoint: str
     service_name: str
     method: str
+
+
+@dataclass(frozen=True)
+class Geometry:
+    """Authoritative machine geometry reported by the plotter primitive."""
+
+    x_min: float
+    x_max: float
+    y_min: float
+    y_max: float
+    z_up: float
+    z_down: float
 
 
 @lru_cache(maxsize=None)
@@ -215,6 +228,30 @@ class PrimitiveClient:
             return self._rpc("home")(pb2.Home_Request(), timeout=self._timeout(timeout_s))
         except grpc.RpcError as exc:
             raise PrimitiveCallError(f"home call failed: {_rpc_error(exc)}") from exc
+
+    def get_status(self, *, timeout_s: float | None = None):
+        """Read the latest PlotterStatus from the primitive's status stream.
+
+        The status contract is ``topic_out`` (server-streaming); we open
+        the stream and take the first message, which carries the
+        authoritative pen heights and drawable area.
+        """
+        pb2 = _pb2()
+        try:
+            stream = self._rpc("status")(
+                pb2.Status_Request(), timeout=self._timeout(timeout_s)
+            )
+            msg = next(stream)
+        except grpc.RpcError as exc:
+            raise PrimitiveCallError(f"status call failed: {_rpc_error(exc)}") from exc
+        return Geometry(
+            x_min=0.0,
+            x_max=float(msg.area_x_max),
+            y_min=0.0,
+            y_max=float(msg.area_y_max),
+            z_up=float(msg.z_up),
+            z_down=float(msg.z_down),
+        )
 
     def close(self) -> None:
         with self._lock:

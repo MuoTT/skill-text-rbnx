@@ -1,18 +1,18 @@
 # SPDX-License-Identifier: MIT
-"""Text layout backed by the Robonix XYZ SDK.
+"""Text layout backed by the vendored geometry package.
 
-The SDK (``SDK/robonix_sdk/text.py``) does the real work:
+The geometry package (``xyz_text/geometry/text.py``) does the real work:
 
     ASCII letters/digits -> Hershey Simplex single-stroke glyphs
     Chinese              -> stroke medians for the 3755 GB2312 level-1 chars
     layout                -> wrapping, overflow checks, cursor, pen up/down
 
-This module only adapts the skill's ``Workspace`` / options to the SDK's
-``TextConfig`` and returns absolute ``(x, y, z)`` waypoints ready for the
-primitive trajectory contract.
+This module only adapts the skill's ``Workspace`` / options to the
+geometry module's ``TextConfig`` and returns absolute ``(x, y, z)``
+waypoints ready for the primitive trajectory contract.
 
 Supported characters: ASCII ``A-Z a-z 0-9``, space, newline, and the
-hanzi in ``hanzi_data.py``. Punctuation is not in the SDK font tables and
+hanzi in ``hanzi_data.py``. Punctuation is not in the font tables and
 raises :class:`TextError`.
 """
 from __future__ import annotations
@@ -20,7 +20,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .plan import PlanError, Workspace
-from .sdk_path import text_module
+from .geometry import text as text_module
 
 
 class TextError(Exception):
