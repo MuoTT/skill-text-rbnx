@@ -232,18 +232,19 @@ class PrimitiveClient:
     def get_status(self, *, timeout_s: float | None = None):
         """Read the latest PlotterStatus from the primitive's status stream.
 
-        The status contract is ``topic_out`` (server-streaming); we open
-        the stream and take the first message, which carries the
-        authoritative pen heights and drawable area.
+        The status contract is ``topic_out`` (server-streaming, no request
+        body); we open the stream and take the first message, which carries
+        the authoritative pen heights and drawable area.
         """
-        pb2 = _pb2()
         try:
-            stream = self._rpc("status")(
-                pb2.Status_Request(), timeout=self._timeout(timeout_s)
-            )
+            stream = self._rpc("status")(timeout=self._timeout(timeout_s))
             msg = next(stream)
         except grpc.RpcError as exc:
             raise PrimitiveCallError(f"status call failed: {_rpc_error(exc)}") from exc
+        except StopIteration as exc:
+            raise PrimitiveCallError(
+                "status stream closed before the first message"
+            ) from exc
         return Geometry(
             x_min=0.0,
             x_max=float(msg.area_x_max),

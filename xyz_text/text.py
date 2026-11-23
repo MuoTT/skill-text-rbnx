@@ -40,9 +40,8 @@ class TextOptions:
 
 
 def _sdk_config(options: TextOptions, width: float, height: float, origin_x: float):
-    sdk = text_module()
     try:
-        cfg = sdk.TextConfig(
+        cfg = text_module.TextConfig(
             font_size_mm=float(options.font_size_mm),
             line_spacing=float(options.line_spacing),
             letter_spacing_mm=float(options.letter_spacing_mm),
@@ -57,7 +56,7 @@ def _sdk_config(options: TextOptions, width: float, height: float, origin_x: flo
         cfg.validate()
     except ValueError as exc:
         raise TextError(str(exc)) from exc
-    return sdk, cfg
+    return cfg
 
 
 def layout_text(text: str, options: TextOptions) -> list[tuple[float, float, float]]:
@@ -81,15 +80,15 @@ def layout_text(text: str, options: TextOptions) -> list[tuple[float, float, flo
             f"[{workspace.x_min}, {workspace.x_max}], got {options.origin_x}"
         )
 
-    sdk, cfg = _sdk_config(options, width, height, origin_x)
+    cfg = _sdk_config(options, width, height, origin_x)
     cursor = None
     if options.origin_y is not None:
         baseline = float(options.origin_y) - workspace.y_min
         cfg.reset_y_mm = None
-        cursor = sdk.Cursor(origin_x, baseline)
+        cursor = text_module.Cursor(origin_x, baseline)
 
     try:
-        points, _ = sdk.layout_text(text, cfg, cursor)
+        points, _ = text_module.layout_text(text, cfg, cursor)
     except ValueError as exc:  # includes TextOverflowError
         raise TextError(str(exc)) from exc
 
