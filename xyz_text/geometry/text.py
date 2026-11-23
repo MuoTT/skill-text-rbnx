@@ -62,7 +62,7 @@ class TextConfig:
     margin_mm: float = 0.0
     origin_x_mm: float = 5.0         # 段落左边界（绝对 X）：每行首字的字格左边缘
     reset_y_mm: float | None = None  # reset 后文字块顶边的绝对 Y；None = 纸高 - margin
-    # Pen heights, supplied by the caller from the primitive's PlotterStatus.
+    # Pen heights, supplied by the caller from the primitive's geometry contract.
     z_up: float = 0.0
     z_down: float = 0.0
     vel: float = 20.0

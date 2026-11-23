@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: MIT
 """Atlas discovery + gRPC calls to the plotter primitive.
 
-The text skill never touches PLC sockets. It resolves the primitive
-contracts through Atlas, then calls the generated gRPC stubs:
+The text skill never touches PLC sockets. It resolves the three primitive contracts through Atlas, then calls the generated gRPC stubs:
 
     robonix/primitive/plotter/trajectory
     robonix/primitive/plotter/home
+    robonix/primitive/plotter/geometry
 
 The mirrored contract files under ``capabilities/primitive/plotter``
 exist only so codegen emits these stubs. They are not declared as
@@ -29,7 +29,7 @@ from robonix_api.atlas_types import GrpcParams, Transport
 REQUIRED_CONTRACTS = {
     "trajectory": "robonix/primitive/plotter/trajectory",
     "home": "robonix/primitive/plotter/home",
-    "status": "robonix/primitive/plotter/status",
+    "geometry": "robonix/primitive/plotter/geometry",
 }
 
 
@@ -229,29 +229,32 @@ class PrimitiveClient:
         except grpc.RpcError as exc:
             raise PrimitiveCallError(f"home call failed: {_rpc_error(exc)}") from exc
 
-    def get_status(self, *, timeout_s: float | None = None):
-        """Read the latest PlotterStatus from the primitive's status stream.
+    def get_geometry(self, *, timeout_s: float | None = None) -> Geometry:
+        """Read the machine geometry once: drawable area + pen heights.
 
-        The status contract is ``topic_out`` (server-streaming, no request
-        body); we open the stream and take the first message, which carries
-        the authoritative pen heights and drawable area.
+        Static configuration, not feedback: the PLC has no readback, so
+        this only differs between machines when the primitive config does.
         """
+        pb2 = _pb2()
         try:
-            stream = self._rpc("status")(timeout=self._timeout(timeout_s))
-            msg = next(stream)
+            response = self._rpc("geometry")(
+                pb2.Geometry_Request(), timeout=self._timeout(timeout_s)
+            )
         except grpc.RpcError as exc:
-            raise PrimitiveCallError(f"status call failed: {_rpc_error(exc)}") from exc
-        except StopIteration as exc:
             raise PrimitiveCallError(
-                "status stream closed before the first message"
+                f"geometry call failed: {_rpc_error(exc)}"
             ) from exc
+        if not response.success:
+            raise PrimitiveCallError(
+                f"geometry call rejected: {response.message or 'unknown error'}"
+            )
         return Geometry(
-            x_min=0.0,
-            x_max=float(msg.area_x_max),
-            y_min=0.0,
-            y_max=float(msg.area_y_max),
-            z_up=float(msg.z_up),
-            z_down=float(msg.z_down),
+            x_min=float(response.x_min),
+            x_max=float(response.x_max),
+            y_min=float(response.y_min),
+            y_max=float(response.y_max),
+            z_up=float(response.z_up),
+            z_down=float(response.z_down),
         )
 
     def close(self) -> None:

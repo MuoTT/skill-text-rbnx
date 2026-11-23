@@ -9,7 +9,7 @@
 
 config:
   # Workspace geometry (drawable area + pen heights) is authoritative in the
-  # plotter primitive and is read from its PlotterStatus on activation. It is
+  # plotter primitive and is read from the plotter geometry contract on activation. It is
   # NOT configured here; any `workspace:` mapping passed in config is ignored
   # in favour of the primitive's reported geometry.
 

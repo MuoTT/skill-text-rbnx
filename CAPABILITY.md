@@ -47,5 +47,5 @@ persists across every write.
 
 - Units: millimetres; paper origin at the lower-left, +X right, +Y up.
 - Drawable area and pen heights are reported by the plotter primitive's
-  `PlotterStatus` on activation; this skill hardcodes none of them.
+  the `geometry` contract on activation; this skill hardcodes none of them.
 - Out-of-bounds plans return `success=false` before any motion.

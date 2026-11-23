@@ -100,7 +100,7 @@ constraints are in [`config.spec`](config.spec).
 
 ```yaml
 # Drawable area and pen heights are NOT configured here. They are read
-# from the plotter primitive's PlotterStatus on activation, so this skill
+# from the plotter primitive's plotter geometry contract on activation, so this skill
 # carries no machine-specific numbers and works on any sized rig.
 font_size_mm: 10.0     # cap height
 line_spacing: 1.5      # baseline-to-baseline = font_size_mm * line_spacing
