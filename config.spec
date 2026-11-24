@@ -9,9 +9,9 @@
 
 config:
   # Workspace geometry (drawable area + pen heights) is authoritative in the
-  # plotter primitive and is read from the plotter geometry contract on activation. It is
-  # NOT configured here; any `workspace:` mapping passed in config is ignored
-  # in favour of the primitive's reported geometry.
+  # plotter primitive and is read from its `geometry` contract on activation.
+  # It is NOT configured here; a `workspace:` mapping in config is only a
+  # fallback used when that contract is unreachable (the skill logs an error).
 
   # ── write_text defaults ────────────────────────────────────────────
   # float mm > 0, default: 10.0. Cap height of the text.
